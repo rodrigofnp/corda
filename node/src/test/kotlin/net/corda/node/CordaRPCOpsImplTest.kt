@@ -152,6 +152,7 @@ class CordaRPCOpsImplTest {
     @Test
     fun `issue and move`() {
 
+        @Suppress("DEPRECATION")
         withPermissions(invokeRpc(CordaRPCOps::stateMachinesFeed),
                 invokeRpc(CordaRPCOps::internalVerifiedTransactionsFeed),
                 invokeRpc("vaultTrackBy"),
@@ -262,8 +263,8 @@ class CordaRPCOpsImplTest {
             assertThatExceptionOfType(java.nio.file.FileAlreadyExistsException::class.java).isThrownBy {
                 val inputJar1 = Thread.currentThread().contextClassLoader.getResourceAsStream(testJar)
                 val inputJar2 = Thread.currentThread().contextClassLoader.getResourceAsStream(testJar)
-                val secureHash1 = rpc.uploadAttachment(inputJar1)
-                val secureHash2 = rpc.uploadAttachment(inputJar2)
+                rpc.uploadAttachment(inputJar1)
+                rpc.uploadAttachment(inputJar2)
             }
         }
     }

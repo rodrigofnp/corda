@@ -76,6 +76,7 @@ data class GeneratedLedger(
             )
         }
         attachmentsGenerator.combine(outputsGen, commandsGenerator) { txAttachments, outputs, commands ->
+            @Suppress("DEPRECATION")
             val newTransaction = WireTransaction(
                     emptyList(),
                     txAttachments.map { it.id },
@@ -103,6 +104,7 @@ data class GeneratedLedger(
     fun exitTransactionGenerator(inputNotary: Party, inputsToChooseFrom: List<StateAndRef<ContractState>>): Generator<Pair<WireTransaction, GeneratedLedger>> {
         val inputsGen = Generator.sampleBernoulli(inputsToChooseFrom)
         return inputsGen.combine(attachmentsGenerator, commandsGenerator) { inputs, txAttachments, commands ->
+            @Suppress("DEPRECATION")
             val newTransaction = WireTransaction(
                     inputs.map { it.ref },
                     txAttachments.map { it.id },
@@ -140,6 +142,7 @@ data class GeneratedLedger(
         }
         val inputsGen = Generator.sampleBernoulli(inputsToChooseFrom)
         return inputsGen.combine(attachmentsGenerator, outputsGen, commandsGenerator) { inputs, txAttachments, outputs, commands ->
+            @Suppress("DEPRECATION")
             val newTransaction = WireTransaction(
                     inputs.map { it.ref },
                     txAttachments.map { it.id },

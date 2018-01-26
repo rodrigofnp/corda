@@ -1103,7 +1103,7 @@ class SerializationOutputTests {
     //
     @Test
     fun reproduceWrongNumberOfArguments() {
-        val field = SerializerFactory::class.java.getDeclaredField("serializersByType").apply {
+        SerializerFactory::class.java.getDeclaredField("serializersByType").apply {
             this.isAccessible = true
         }
 

@@ -373,7 +373,7 @@ inline fun <T : Any> SerializedBytes<T>.sign(signer: (SerializedBytes<T>) -> Dig
     return SignedData(this, signer(this))
 }
 
-inline fun <T : Any> SerializedBytes<T>.sign(keyPair: KeyPair): SignedData<T> {
+fun <T : Any> SerializedBytes<T>.sign(keyPair: KeyPair): SignedData<T> {
     return SignedData(this, keyPair.sign(this.bytes))
 }
 

@@ -110,7 +110,7 @@ class SSHServerTest {
             channel.connect()
             val response = String(Streams.readAll(channel.inputStream))
 
-            val flowNameEscaped = Pattern.quote("StartFlow.${SSHServerTest::class.qualifiedName}$${FlowICannotRun::class.simpleName}")
+            Pattern.quote("StartFlow.${SSHServerTest::class.qualifiedName}$${FlowICannotRun::class.simpleName}")
 
             channel.disconnect()
             session.disconnect()

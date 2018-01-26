@@ -689,8 +689,9 @@ class HibernateConfigurationTest {
         val queryResults = entityManager.createQuery(criteriaQuery).resultList
 
         queryResults.forEach {
-            val cashState = (services.loadState(toStateRef(it.stateRef!!)) as TransactionState<Cash.State>).data
-            println("${it.stateRef} with owner: ${cashState.owner.owningKey.toBase58String()}")
+            val data = services.loadState(toStateRef(it.stateRef!!)).data
+            assert(data is Cash.State)
+            println("${it.stateRef} with owner: ${(data as Cash.State).owner.owningKey.toBase58String()}")
         }
 
         assertThat(queryResults).hasSize(12)
@@ -773,7 +774,9 @@ class HibernateConfigurationTest {
         // execute query
         val queryResults = entityManager.createQuery(criteriaQuery).resultList
         queryResults.forEach {
-            val cashState = (services.loadState(toStateRef(it.stateRef!!)) as TransactionState<Cash.State>).data
+            val data = services.loadState(toStateRef(it.stateRef!!)).data
+            assert(data is Cash.State)
+            val cashState = data as Cash.State
             println("${it.stateRef} with owner ${cashState.owner.owningKey.toBase58String()} and participants ${cashState.participants.map { it.owningKey.toBase58String() }}")
         }
 

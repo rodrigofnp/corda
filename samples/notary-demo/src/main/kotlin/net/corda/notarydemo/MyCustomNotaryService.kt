@@ -6,7 +6,6 @@ import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.flows.*
 import net.corda.core.node.AppServiceHub
 import net.corda.core.node.services.CordaService
-import net.corda.core.node.services.TimeWindowChecker
 import net.corda.core.node.services.TrustedAuthorityNotaryService
 import net.corda.core.transactions.LedgerTransaction
 import net.corda.core.transactions.TransactionWithSignatures
