@@ -57,10 +57,8 @@ import net.corda.node.services.transactions.*
 import net.corda.node.services.upgrade.ContractUpgradeServiceImpl
 import net.corda.node.services.vault.NodeVaultService
 import net.corda.node.services.vault.VaultSoftLockManager
-import net.corda.node.shell.InteractiveShell
 import net.corda.node.utilities.AffinityExecutor
 import net.corda.nodeapi.internal.DevIdentityGenerator
-import net.corda.nodeapi.internal.SignedNodeInfo
 import net.corda.nodeapi.internal.config.User
 import net.corda.nodeapi.internal.crypto.X509Utilities
 import net.corda.nodeapi.internal.persistence.CordaPersistence
@@ -68,6 +66,8 @@ import net.corda.nodeapi.internal.persistence.DatabaseConfig
 import net.corda.nodeapi.internal.persistence.HibernateConfiguration
 import net.corda.nodeapi.internal.sign
 import net.corda.nodeapi.internal.storeLegalIdentity
+import net.corda.shell.ShellConfiguration
+import net.corda.shell.StandaloneShell
 import org.apache.activemq.artemis.utils.ReusableLatch
 import org.hibernate.type.descriptor.java.JavaTypeDescriptorRegistry
 import org.slf4j.Logger
@@ -243,13 +243,10 @@ abstract class AbstractNode(val configuration: NodeConfiguration,
 
             startShell({ username: String?, credentials: String? ->
                 if (configuration.rpcOptions.address == null) {
-                    Node.printBasicNodeInfo("CordaRPCOps - direct access")
                     rpcOps
                 } else {
                     val client = CordaRPCClient(configuration.rpcOptions.address!!)
-                    Node.printBasicNodeInfo("CordaRPCOps - RPC access with ${username ?: "default"}")
-                    val rpcUser = User(username ?: "demo", credentials
-                            ?: "demo", permissions = setOf(Permissions.all()))
+                    val rpcUser = User(username ?: "demo", credentials ?: "demo", permissions = setOf(Permissions.all()))
                     client.start(rpcUser.username, rpcUser.password).proxy
                 }
             })
@@ -291,7 +288,10 @@ abstract class AbstractNode(val configuration: NodeConfiguration,
 
     open fun startShell(rpcOps: (String?, String?) -> CordaRPCOps) {
         if (configuration.shouldInitCrashShell()) {
-            InteractiveShell.startShell(configuration, rpcOps, securityManager, _services.identityService, _services.database)
+            val shellConfiguration = ShellConfiguration(configuration.baseDirectory,
+                    configuration.rpcOptions.address ?: NetworkHostAndPort("localhost", 2222),
+                    configuration.rpcOptions.sslConfig, configuration.sshd, false)
+            StandaloneShell.startShell(shellConfiguration, rpcOps, localUserName = "demo", localUserPassword = "demo")
         }
     }
 

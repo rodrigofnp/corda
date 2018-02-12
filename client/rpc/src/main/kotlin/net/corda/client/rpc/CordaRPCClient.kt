@@ -73,14 +73,15 @@ data class CordaRPCClientConfiguration(val connectionMaxRetryInterval: Duration)
 class CordaRPCClient @JvmOverloads constructor(
         hostAndPort: NetworkHostAndPort,
         configuration: CordaRPCClientConfiguration = CordaRPCClientConfiguration.DEFAULT,
-        sslConfiguration: SSLConfiguration? = null
+        sslConfiguration: SSLConfiguration? = null,
+        classLoader: ClassLoader? = null
 ) {
     init {
         try {
             effectiveSerializationEnv
         } catch (e: IllegalStateException) {
             try {
-                KryoClientSerializationScheme.initialiseSerialization()
+                KryoClientSerializationScheme.initialiseSerialization(classLoader)
             } catch (e: IllegalStateException) {
                 // Race e.g. two of these constructed in parallel, ignore.
             }
@@ -90,7 +91,7 @@ class CordaRPCClient @JvmOverloads constructor(
     private val rpcClient = RPCClient<CordaRPCOps>(
             tcpTransport(ConnectionDirection.Outbound(), hostAndPort, config = sslConfiguration),
             configuration.toRpcClientConfiguration(),
-            KRYO_RPC_CLIENT_CONTEXT
+            if(classLoader != null) KRYO_RPC_CLIENT_CONTEXT.withClassLoader(classLoader) else KRYO_RPC_CLIENT_CONTEXT
     )
 
     /**
