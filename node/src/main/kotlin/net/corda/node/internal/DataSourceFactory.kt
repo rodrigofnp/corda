@@ -25,11 +25,11 @@ object DataSourceFactory {
     }
 
     init {
-        LoggerFactory.getLogger(javaClass).debug("Applying H2 fix.") // See CORDA-924.
-        Engine::class.java.getDeclaredField("DATABASES").apply {
-            isAccessible = true
-            declaredField<Int>("modifiers").apply { value = value and Modifier.FINAL.inv() }
-        }.set(null, SynchronizedGetPutRemove<String, Database>())
+//        LoggerFactory.getLogger(javaClass).debug("Applying H2 fix.") // See CORDA-924.
+//        Engine::class.java.getDeclaredField("DATABASES").apply {
+//            isAccessible = true
+//            declaredField<Int>("modifiers").apply { value = value and Modifier.FINAL.inv() }
+//        }.set(null, SynchronizedGetPutRemove<String, Database>())
     }
 
     fun createDataSource(hikariProperties: Properties, pool: Boolean = true): DataSource {
