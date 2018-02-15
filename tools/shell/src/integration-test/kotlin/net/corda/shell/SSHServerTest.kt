@@ -8,9 +8,11 @@ import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.identity.Party
+import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.unwrap
+import net.corda.node.services.Permissions.Companion.invokeRpc
 import net.corda.node.services.Permissions.Companion.startFlow
 import net.corda.testing.core.ALICE_NAME
 import net.corda.testing.node.User
@@ -19,7 +21,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.bouncycastle.util.io.Streams
 import org.junit.Test
 import java.net.ConnectException
-import java.util.regex.Pattern
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -90,7 +91,8 @@ class SSHServerTest {
 
     @Test
     fun `ssh respects permissions`() {
-        val user = User("u", "p", setOf(startFlow<FlowICanRun>()))
+        val user = User("u", "p", setOf(startFlow<FlowICanRun>(),
+                invokeRpc(CordaRPCOps::wellKnownPartyFromX500Name)))
         // The driver will automatically pick up the annotated flows below
         driver(isDebug = true) {
             val node = startNode(providedName = ALICE_NAME, rpcUsers = listOf(user),
@@ -105,11 +107,9 @@ class SSHServerTest {
             assertTrue(session.isConnected)
 
             val channel = session.openChannel("exec") as ChannelExec
-            channel.setCommand("start FlowICannotRun otherParty: \"${ALICE_NAME}\"")
+            channel.setCommand("start FlowICannotRun otherParty: \"$ALICE_NAME\"")
             channel.connect()
             val response = String(Streams.readAll(channel.inputStream))
-
-            val flowNameEscaped = Pattern.quote("StartFlow.${SSHServerTest::class.qualifiedName}$${FlowICannotRun::class.simpleName}")
 
             channel.disconnect()
             session.disconnect()
